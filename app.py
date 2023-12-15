@@ -131,7 +131,7 @@ if selected =="Home":
             # Convert the results to a DataFrame
             #most_common_words_df = pd.DataFrame(word_counts.most_common(), columns=['Word', 'Count'])
             st.title("Most Used Words in Reviews")
-            most_common_words_df = pd.DataFrame(most_common_words, columns=['Words', 'Number of times Words'])
+            most_common_words_df = pd.DataFrame(most_common_words, columns=['Words', 'Number of times Words']).head(10)
 
             # Display the DataFrame in Streamlit
             st.dataframe(most_common_words_df)
@@ -148,7 +148,7 @@ if selected =="Home":
             st.title("Scatter Plot Showing Polarity Score of Reviews")
             df['Sentiment'] = df['Review'].apply(get_sentiment_polarity)
             fig = px.scatter(df, x=df.index, y='Sentiment',
-                        labels={'index': 'Words', 'Sentiment': 'Sentiment'})
+                        labels={'index': 'Index', 'Sentiment': 'Sentiment'})
             fig.update_yaxes(tickvals=[-1, 0, 1])
             fig.add_hline(y=0, line_dash="dash", line_color="black")
             fig.add_hline(y=0.5, line_dash="dash", line_color="green")
@@ -192,9 +192,10 @@ if selected =="Home":
             fig = px.pie(
             names=rating_percentages.index,
             values=rating_percentages.values,
-            title='Rating Distribution',labels=None
+            title='Rating Distribution'
             #labels={'names': 'Rating', 'values': 'Percentage'}
             )
+            fig.update_layout(showlegend=False)
             #fig.update_layout(legend=dict(title=None))
             #fig.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1, xanchor="right", x=1))
 
@@ -214,7 +215,7 @@ if selected =="Home":
         #sorted_df = df.sort_values(by='Calories', ascending=False)
 
         columns_to_display = [ 'AuthorName_y', 'Name', 'Calories']
-        st.write("Original DataFrame (Selected Columns):")
+        #st.write("Original DataFrame (Selected Columns):")
         st.write(df1[columns_to_display])
 
         #st.write(df)
@@ -240,14 +241,20 @@ if selected =="Home":
         
         selected_recipes = df[(df['Calories'] >= 50) & (df['Calories'] <= 100)]
         top_10_recipes = selected_recipes.sort_values(by='Calories', ascending=True).head(10)
-        st.title("Recipes having calories between 50 to 150")
+        st.title("Recipes having calories up to 150")
+        #fig.update_xaxes(categoryorder='total descending', range=[50, max(top_10_recipes['Calories'])])
         fig = px.bar(top_10_recipes, x='Name', y='Calories', hover_data=['RecipeYield'], labels={'Calories': 'Number of Calories', 'Name': 'Recipe Name'})
+        #fig.update_xaxes(categoryorder='total descending', range=[50, max(top_10_recipes['Calories'])])
 
 # Customize the layout
         fig.update_layout(
                   xaxis_title='Recipe Name',
                   yaxis_title='Number of Calories')
         fig.update_xaxes(categoryorder='total descending')
+        #fig.update_yaxes(range=[50, 150])
+        #fig.update_yaxes(range=[50, 150])
+        #fig.update_yaxes(range=[50, max(top_10_recipes['Calories'])])
+
         st.plotly_chart(fig)
 
 # Show the plot
@@ -309,7 +316,10 @@ if st.button('Check the Sentiments', key=3):
         elif compound_score >= 0:
             st.subheader("Our Model has Predicted Positive Sentiment")
         elif compound_score <0:
-            compound_score =  np.abs(sentiment_scores['compound']*100)
+            #compound_score =  np.abs.round(sentiment_scores['compound']*100,2)
+            compound_score = np.abs(np.round(sentiment_scores['compound'] * 100, 2))
+
+
         
             
 
